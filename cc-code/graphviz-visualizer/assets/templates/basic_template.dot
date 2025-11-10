@@ -1,0 +1,89 @@
+digraph TemplateStructure {
+    rankdir=LR;
+    node [fontname="Arial", fontsize=9];
+
+    // ============================================
+    // 全局指针/根节点 - 浅黄色
+    // ============================================
+    root_node [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD PORT="top"><B>global_pointer</B></TD></TR>
+            <TR><TD>type: struct xyz *</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 主数据结构 - 浅绿色
+    // ============================================
+    main_struct [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top" COLSPAN="2"><B>main_data_structure</B></TD></TR>
+            <TR><TD>field1</TD><TD>type: int</TD></TR>
+            <TR><TD>field2</TD><TD>type: char *</TD></TR>
+            <TR><TD PORT="ptr_field">ptr_field</TD><TD>type: struct * </TD></TR>
+            <TR><TD>field4</TD><TD>type: void *</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // Internal/源侧结构 - 浅蓝色
+    // ============================================
+    internal_struct [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightblue">
+            <TR><TD PORT="top"><B>internal_structure</B></TD></TR>
+            <TR><TD>internal_addr</TD></TR>
+            <TR><TD>internal_port</TD></TR>
+            <TR><TD PORT="next">next</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // External/目标侧结构 - 浅珊瑚色
+    // ============================================
+    external_struct [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightcoral">
+            <TR><TD PORT="top"><B>external_structure</B></TD></TR>
+            <TR><TD>external_addr</TD></TR>
+            <TR><TD>external_port</TD></TR>
+            <TR><TD PORT="next">next</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 辅助结构 - 小麦色
+    // ============================================
+    aux_struct [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="wheat">
+            <TR><TD PORT="top"><B>auxiliary_structure</B></TD></TR>
+            <TR><TD>aux_field1</TD></TR>
+            <TR><TD>aux_field2</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 说明框 - 浅黄色
+    // ============================================
+    note_box [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD ALIGN="LEFT"><B>关键说明:</B></TD></TR>
+            <TR><TD ALIGN="LEFT">• 说明要点 1</TD></TR>
+            <TR><TD ALIGN="LEFT">• 说明要点 2</TD></TR>
+            <TR><TD ALIGN="LEFT">• 说明要点 3</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 连接关系
+    // ============================================
+    // 普通指针连接
+    root_node:top -> main_struct:top [label="指向"];
+
+    // 指针字段连接
+    main_struct:ptr_field -> aux_struct:top [label="ptr"];
+
+    // 说明引用（虚线）
+    note_box -> main_struct [style=dotted, color=gray];
+
+    // 链表连接（绿色）
+    internal_struct:next -> external_struct:top [label="next", color=green];
+}

@@ -1,0 +1,111 @@
+// NAT Servermap 哈希表链式结构图
+// 模仿 ip_conntrack_hash 的显示风格
+digraph NAT_Servermap_Hash_Structure {
+    rankdir=LR;
+    node [fontname="Arial", fontsize=9];
+
+    // Internal 哈希表 (按 i_saddr+i_sport 索引)
+    subgraph cluster_internal_hash {
+        label="ip_nat_servermap_hash (Internal: by i_saddr + i_sport)";
+        style=filled;
+        color=lightblue;
+
+        inter_hash_head [label="g_nsm_by_address_hash_table_inter", shape=box, style=filled, color=lightyellow];
+
+        // 哈希桶链表头
+        subgraph cluster_inter_buckets {
+            label="";
+            style=invis;
+
+            inter_bucket_0 [label="{<h0>list_head|<h1>list_head|<h2>list_head|......|<hn>list_head|<hm>list_head}", shape=record, style=filled, color=lightblue];
+        }
+    }
+
+    // External 哈希表 (按 e_addr+e_port 索引)
+    subgraph cluster_external_hash {
+        label="ip_nat_servermap_hash (External: by e_addr + e_port)";
+        style=filled;
+        color=lightcoral;
+
+        ext_hash_head [label="g_nsm_by_address_hash_table_ext", shape=box, style=filled, color=lightyellow];
+
+        // 哈希桶链表头
+        subgraph cluster_ext_buckets {
+            label="";
+            style=invis;
+
+            ext_bucket_0 [label="{<h0>list_head|<h1>list_head|<h2>list_head|......|<hn>list_head|<hm>list_head}", shape=record, style=filled, color=lightcoral];
+        }
+    }
+
+    // ServerMap 节点链 (示例1)
+    subgraph cluster_node1 {
+        label="";
+        style=filled;
+        color=lightgreen;
+
+        node1 [label="{<top>ip_nat_servermap_node|<ext>nsm_node_by_ext|<inter>nsm_node_by_inter|{src|<sip>IP: 192.168.1.10|<sport>port: 12345}|{dst|<dip>IP: 203.0.113.1|<dport>port: 5001}|{proto: UDP|dir: ORIGINAL}}", shape=Mrecord, style=filled, color=palegreen];
+    }
+
+    // ServerMap 节点链 (示例2)
+    subgraph cluster_node2 {
+        label="";
+        style=filled;
+        color=lightgreen;
+
+        node2 [label="{<top>ip_nat_servermap_node|<ext>nsm_node_by_ext|<inter>nsm_node_by_inter|{src|<sip>IP: 192.168.1.20|<sport>port: 54321}|{dst|<dip>IP: 203.0.113.1|<dport>port: 5002}|{proto: TCP|dir: ORIGINAL}}", shape=Mrecord, style=filled, color=palegreen];
+    }
+
+    // ServerMap 节点链 (示例3)
+    subgraph cluster_node3 {
+        label="";
+        style=filled;
+        color=lightgreen;
+
+        node3 [label="{<top>ip_nat_servermap_node|<ext>nsm_node_by_ext|<inter>nsm_node_by_inter|{src|<sip>IP: 192.168.1.10|<sport>port: 23456}|{dst|<dip>IP: 203.0.113.1|<dport>port: 5003}|{proto: UDP|dir: ORIGINAL}}", shape=Mrecord, style=filled, color=palegreen];
+    }
+
+    // 更多节点占位符
+    more_nodes [label="......", shape=plaintext];
+
+    // Internal Tuple List (链接到 node1)
+    subgraph cluster_tuple_list {
+        label="internal_tuple_list (linked to node1)";
+        style=filled;
+        color=wheat;
+
+        tuple1 [label="{ip_nat_servermap_internal_tuple|{tuple|{src|IP: 192.168.1.10|port: 12345}}|{dst|IP: 93.184.216.34|port: 80}}", shape=record];
+
+        tuple2 [label="{ip_nat_servermap_internal_tuple|{tuple|{src|IP: 192.168.1.10|port: 12345}}|{dst|IP: 142.250.185.206|port: 443}}", shape=record];
+
+        tuple3 [label="......", shape=plaintext];
+    }
+
+    // Hash Chain 结构说明
+    chain_struct [label="{ip_nat_servermap_hash_chain|nsm_hlist (hlist_head)|nsmh_lock (rwlock_t)|count (atomic32_t)}", shape=record, style=filled, color=lightgray];
+
+    // 连接关系 - Internal Hash
+    inter_hash_head -> inter_bucket_0;
+    inter_bucket_0:h1 -> node1:inter [label="hash链", color=blue, penwidth=2];
+    inter_bucket_0:h2 -> node3:inter [label="hash链", color=blue, penwidth=2];
+
+    // 连接关系 - External Hash
+    ext_hash_head -> ext_bucket_0;
+    ext_bucket_0:h0 -> node1:ext [label="hash链", color=red, penwidth=2];
+    ext_bucket_0:h1 -> node2:ext [label="hash链", color=red, penwidth=2];
+    node2:ext -> node3:ext [label="冲突链", color=red];
+
+    // 节点间连接
+    node3:ext -> more_nodes [style=dashed];
+
+    // Internal Tuple List 连接
+    node1 -> tuple1 [label="internal_tuple_list", color=green, style=dashed];
+    tuple1 -> tuple2 [label="next", color=green];
+    tuple2 -> tuple3 [label="next", color=green];
+
+    // 结构说明
+    chain_struct -> inter_bucket_0:h0 [label="每个bucket\n的结构", style=dotted];
+
+    // 说明文字
+    note [label="关键点:\n• 每个 servermap_node 同时挂载在两个哈希表上\n• Internal hash: 按 (i_saddr, i_sport) 索引\n• External hash: 按 (e_addr, e_port) 索引\n• internal_tuple_list 记录复用该映射的所有原始连接\n• refcnt 表示有多少个 tuple 引用该 servermap_node", shape=note, style=filled, color=lightyellow];
+}

@@ -1,0 +1,95 @@
+digraph HashTableTemplate {
+    rankdir=LR;
+    node [fontname="Arial", fontsize=9];
+
+    // ============================================
+    // 哈希表头指针 - 浅黄色
+    // ============================================
+    hash_head [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD><B>hash_table_head</B></TD></TR>
+            <TR><TD>size: 256</TD></TR>
+            <TR><TD>count: 42</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 哈希桶数组（水平布局）- 浅蓝色
+    // ============================================
+    buckets [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightblue">
+            <TR>
+                <TD PORT="b0">bucket[0]</TD>
+                <TD PORT="b1">bucket[1]</TD>
+                <TD PORT="b2">bucket[2]</TD>
+                <TD PORT="b3">bucket[3]</TD>
+                <TD>......</TD>
+                <TD PORT="bn">bucket[n-1]</TD>
+            </TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 链表节点 1 - 浅绿色
+    // ============================================
+    node1 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top"><B>hash_node</B></TD></TR>
+            <TR><TD>key: "example_key_1"</TD></TR>
+            <TR><TD>value: 100</TD></TR>
+            <TR><TD>hash: 0x1234</TD></TR>
+            <TR><TD PORT="next">next</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 链表节点 2 - 浅绿色
+    // ============================================
+    node2 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top"><B>hash_node</B></TD></TR>
+            <TR><TD>key: "example_key_2"</TD></TR>
+            <TR><TD>value: 200</TD></TR>
+            <TR><TD>hash: 0x1234</TD></TR>
+            <TR><TD PORT="next">next: NULL</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 其他桶的节点 - 浅绿色
+    // ============================================
+    node3 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top"><B>hash_node</B></TD></TR>
+            <TR><TD>key: "another_key"</TD></TR>
+            <TR><TD>value: 300</TD></TR>
+            <TR><TD>hash: 0xABCD</TD></TR>
+            <TR><TD PORT="next">next: NULL</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 占位符 - 浅灰色
+    // ============================================
+    more [label=<
+        <TABLE BORDER="0" CELLBORDER="0" CELLSPACING="0" BGCOLOR="lightgray">
+            <TR><TD>...更多节点...</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 连接关系
+    // ============================================
+    // 表头到桶数组
+    hash_head -> buckets [label="buckets[]"];
+
+    // 桶到链表（蓝色粗线表示哈希连接）
+    buckets:b2 -> node1:top [color=blue, penwidth=2, label="hash链"];
+    buckets:b3 -> node3:top [color=blue, penwidth=2, label="hash链"];
+
+    // 链表内部连接（绿色）
+    node1:next -> node2:top [color=green, label="next"];
+
+    // 虚线表示省略部分
+    node3 -> more [style=dashed, color=gray];
+}

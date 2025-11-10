@@ -1,0 +1,33 @@
+// NAT Servermap 双哈希结构可视化
+digraph NAT_Servermap {
+    rankdir=LR;
+    node [shape=record, fontname="Arial", fontsize=10];
+
+    // 哈希桶
+    inter_bucket [label="{<head> g_nsm..._inter\n[i_hash_key] | hlist_head }"];
+    ext_bucket  [label="{<head> g_nsm..._ext\n[e_hash_key] | hlist_head }"];
+
+    // 主节点
+    node_servermap [
+        label = "{ip_nat_servermap_node|\n\
+        e_addr: 203.0.113.1 | e_port: 5001 |\n\
+        i_saddr: 192.168.1.10 | i_sport: 12345 |\n\
+        refcnt: 2 |\n\
+        ... \n\
+        |{<ext> nsm_node_by_ext|\n\
+           <inter> nsm_node_by_inter|\n\
+           <list> internal_tuple_list}}",
+        shape=Mrecord
+    ];
+
+    // 哈希链接
+    inter_bucket:head -> node_servermap:inter [label="hlist"];
+    ext_bucket:head -> node_servermap:ext [label="hlist"];
+
+    // internal_tuple_list 链表
+    tuple1 [label="{ip_nat_servermap_internal_tuple|\ntuple: (192.168.1.10:12345 → 93.184.216.34:80)}"];
+    tuple2 [label="{ip_nat_servermap_internal_tuple|\ntuple: (192.168.1.10:12345 → 142.250.185.206:443)}"];
+
+    node_servermap:list -> tuple1;
+    tuple1 -> tuple2 [label="list"];
+}

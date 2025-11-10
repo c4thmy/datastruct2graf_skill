@@ -1,0 +1,102 @@
+// NAT Servermap 数据结构关系图
+// 参照 ip_conntrack 风格展示完整的哈希表和节点结构
+digraph NAT_Servermap_Structure {
+    rankdir=LR;
+    node [fontname="Arial", fontsize=9];
+
+    // 全局哈希表指针数组
+    subgraph cluster_global {
+        label="Global Hash Tables";
+        style=filled;
+        color=lightgrey;
+
+        g_inter [label="g_nsm_by_address\n_hash_table_inter", shape=box, style=filled, color=lightyellow];
+        g_ext [label="g_nsm_by_address\n_hash_table_ext", shape=box, style=filled, color=lightyellow];
+    }
+
+    // Internal 哈希表结构
+    subgraph cluster_inter_table {
+        label="ip_nat_servermap_hash_table_inter";
+        style=filled;
+        color=lightblue;
+
+        inter_table [label="{ip_nat_servermap_hash_table_inter|nsm_hashs_inter\n[NAT_SERVERMAP_HASH_SIZE]}", shape=record];
+    }
+
+    // External 哈希表结构
+    subgraph cluster_ext_table {
+        label="ip_nat_servermap_hash_table_ext";
+        style=filled;
+        color=lightcoral;
+
+        ext_table [label="{ip_nat_servermap_hash_table_ext|nsm_hashs_ext\n[NAT_SERVERMAP_HASH_SIZE]}", shape=record];
+    }
+
+    // 哈希桶结构 (internal)
+    subgraph cluster_inter_chain {
+        label="Hash Chain (Internal)";
+        style=filled;
+        color=lightblue;
+
+        inter_chain [label="{<head>ip_nat_servermap_hash_chain|nsm_hlist (hlist_head)|nsmh_lock (rwlock)|count (atomic32)}", shape=Mrecord];
+    }
+
+    // 哈希桶结构 (external)
+    subgraph cluster_ext_chain {
+        label="Hash Chain (External)";
+        style=filled;
+        color=lightcoral;
+
+        ext_chain [label="{<head>ip_nat_servermap_hash_chain|nsm_hlist (hlist_head)|nsmh_lock (rwlock)|count (atomic32)}", shape=Mrecord];
+    }
+
+    // ServerMap 节点结构
+    subgraph cluster_servermap_node {
+        label="ip_nat_servermap_node";
+        style=filled;
+        color=lightgreen;
+
+        node_detail [label="{<top>ip_nat_servermap_node|<ext_hash>nsm_node_by_ext_address_hash|<inter_hash>nsm_node_by_internal_address_hash|<list>internal_tuple_list (list_head)|timer|servermapping_lock|snat_ct_del_time|<eaddr>e_addr|<eport>e_port|<iaddr>i_saddr|<iport>i_sport|<refcnt>refcnt (atomic32)|inter_tuple_count|i_hash_key|e_hash_key|entry_vsys_id|entry_id|protonum|map_init_timer_flag}", shape=Mrecord];
+    }
+
+    // Internal Tuple 结构
+    subgraph cluster_internal_tuple {
+        label="Internal Tuple List";
+        style=filled;
+        color=palegreen;
+
+        tuple_1 [label="{<head>ip_nat_servermap_internal_tuple|node (list_head)|tuple|src|<src_ip>IP: 192.168.1.10|<src_port>port: 12345|dst|<dst_ip>IP: 93.184.216.34|<dst_port>port: 80}", shape=Mrecord];
+
+        tuple_2 [label="{ip_nat_servermap_internal_tuple|node (list_head)|tuple|src|IP: 192.168.1.10|port: 12345|dst|IP: 142.250.185.206|port: 443}", shape=Mrecord];
+
+        tuple_3 [label="{......}", shape=plaintext];
+    }
+
+    // Timer 结构
+    subgraph cluster_timer {
+        label="ip_nat_servermapping_timeout";
+        style=filled;
+        color=wheat;
+
+        timer_detail [label="{ip_nat_servermapping_timeout|mapping_node_timer\n(tb_rte_timer)|expires (long)}", shape=record];
+    }
+
+    // 连接关系
+    g_inter -> inter_table [label="指向"];
+    g_ext -> ext_table [label="指向"];
+
+    inter_table -> inter_chain [label="数组元素\n[i_hash_key]"];
+    ext_table -> ext_chain [label="数组元素\n[e_hash_key]"];
+
+    inter_chain:head -> node_detail:inter_hash [label="hlist", color=blue];
+    ext_chain:head -> node_detail:ext_hash [label="hlist", color=red];
+
+    node_detail:list -> tuple_1:head [label="list_head", color=green];
+    tuple_1 -> tuple_2 [label="next", color=green];
+    tuple_2 -> tuple_3 [label="next", color=green];
+
+    node_detail -> timer_detail [label="包含", style=dashed];
+
+    // 说明文字
+    note1 [label="说明:\n1. 每个 servermap_node 通过两个 hlist_node 分别链接到\n   internal 和 external 哈希表\n2. refcnt 记录有多少个 internal_tuple 引用此节点\n3. internal_tuple_list 记录所有使用该映射的原始连接\n4. timer 用于连接老化后延迟释放 servermap 节点", shape=note, style=filled, color=lightyellow];
+}

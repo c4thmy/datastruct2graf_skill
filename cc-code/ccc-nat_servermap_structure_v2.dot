@@ -1,0 +1,151 @@
+// NAT Servermap 数据结构关系图 - 垂直布局版本
+// 参照示例图片风格，每个结构内字段垂直排列
+digraph NAT_Servermap_Structure {
+    rankdir=LR;
+    node [fontname="Arial", fontsize=9];
+
+    // 全局哈希表指针 - Internal
+    g_inter [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD COLSPAN="1"><B>g_nsm_by_address_hash_table_inter</B></TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 全局哈希表指针 - External
+    g_ext [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD COLSPAN="1"><B>g_nsm_by_address_hash_table_ext</B></TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // Internal 哈希表结构
+    inter_table [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightblue">
+            <TR><TD COLSPAN="1"><B>ip_nat_servermap_hash_table_inter</B></TD></TR>
+            <TR><TD>nsm_hashs_inter[NAT_SERVERMAP_HASH_SIZE]</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // External 哈希表结构
+    ext_table [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightcoral">
+            <TR><TD COLSPAN="1"><B>ip_nat_servermap_hash_table_ext</B></TD></TR>
+            <TR><TD>nsm_hashs_ext[NAT_SERVERMAP_HASH_SIZE]</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 哈希桶结构 (internal)
+    inter_chain [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightblue">
+            <TR><TD PORT="head" COLSPAN="1"><B>ip_nat_servermap_hash_chain</B></TD></TR>
+            <TR><TD>nsm_hlist (hlist_head)</TD></TR>
+            <TR><TD>nsmh_lock (rwlock)</TD></TR>
+            <TR><TD>count (atomic32)</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 哈希桶结构 (external)
+    ext_chain [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightcoral">
+            <TR><TD PORT="head" COLSPAN="1"><B>ip_nat_servermap_hash_chain</B></TD></TR>
+            <TR><TD>nsm_hlist (hlist_head)</TD></TR>
+            <TR><TD>nsmh_lock (rwlock)</TD></TR>
+            <TR><TD>count (atomic32)</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ServerMap 节点结构
+    node_detail [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top" COLSPAN="1"><B>ip_nat_servermap_node</B></TD></TR>
+            <TR><TD PORT="ext_hash">nsm_node_by_ext_address_hash</TD></TR>
+            <TR><TD PORT="inter_hash">nsm_node_by_internal_address_hash</TD></TR>
+            <TR><TD PORT="list">internal_tuple_list (list_head)</TD></TR>
+            <TR><TD>timer</TD></TR>
+            <TR><TD>servermapping_lock</TD></TR>
+            <TR><TD>snat_ct_del_time</TD></TR>
+            <TR><TD PORT="eaddr">e_addr</TD></TR>
+            <TR><TD PORT="eport">e_port</TD></TR>
+            <TR><TD PORT="iaddr">i_saddr</TD></TR>
+            <TR><TD PORT="iport">i_sport</TD></TR>
+            <TR><TD PORT="refcnt">refcnt (atomic32)</TD></TR>
+            <TR><TD>inter_tuple_count</TD></TR>
+            <TR><TD>i_hash_key</TD></TR>
+            <TR><TD>e_hash_key</TD></TR>
+            <TR><TD>entry_vsys_id</TD></TR>
+            <TR><TD>entry_id</TD></TR>
+            <TR><TD>protonum</TD></TR>
+            <TR><TD>map_init_timer_flag</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // Internal Tuple 结构 1
+    tuple_1 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="wheat">
+            <TR><TD PORT="head" COLSPAN="1"><B>ip_nat_servermap_internal_tuple</B></TD></TR>
+            <TR><TD>node (list_head)</TD></TR>
+            <TR><TD>tuple</TD></TR>
+            <TR><TD>src</TD></TR>
+            <TR><TD PORT="src_ip">IP: 192.168.1.10</TD></TR>
+            <TR><TD PORT="src_port">port: 12345</TD></TR>
+            <TR><TD>dst</TD></TR>
+            <TR><TD PORT="dst_ip">IP: 93.184.216.34</TD></TR>
+            <TR><TD PORT="dst_port">port: 80</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // Internal Tuple 结构 2
+    tuple_2 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="wheat">
+            <TR><TD COLSPAN="1"><B>ip_nat_servermap_internal_tuple</B></TD></TR>
+            <TR><TD>node (list_head)</TD></TR>
+            <TR><TD>tuple</TD></TR>
+            <TR><TD>src</TD></TR>
+            <TR><TD>IP: 192.168.1.10</TD></TR>
+            <TR><TD>port: 12345</TD></TR>
+            <TR><TD>dst</TD></TR>
+            <TR><TD>IP: 142.250.185.206</TD></TR>
+            <TR><TD>port: 443</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 更多节点占位符
+    tuple_more [label="......", shape=plaintext];
+
+    // Timer 结构
+    timer_detail [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="wheat">
+            <TR><TD COLSPAN="1"><B>ip_nat_servermapping_timeout</B></TD></TR>
+            <TR><TD>mapping_node_timer (tb_rte_timer)</TD></TR>
+            <TR><TD>expires (long)</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 连接关系
+    g_inter -> inter_table [label="指向"];
+    g_ext -> ext_table [label="指向"];
+
+    inter_table -> inter_chain [label="数组元素[i_hash_key]"];
+    ext_table -> ext_chain [label="数组元素[e_hash_key]"];
+
+    inter_chain:head -> node_detail:inter_hash [label="hlist", color=blue, penwidth=2];
+    ext_chain:head -> node_detail:ext_hash [label="hlist", color=red, penwidth=2];
+
+    node_detail:list -> tuple_1:head [label="list_head", color=green, penwidth=2];
+    tuple_1 -> tuple_2 [label="next", color=green];
+    tuple_2 -> tuple_more [label="next", color=green, style=dashed];
+
+    node_detail -> timer_detail [label="包含", style=dashed];
+
+    // 说明文字
+    note1 [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD ALIGN="LEFT"><B>说明:</B></TD></TR>
+            <TR><TD ALIGN="LEFT">1. 每个 servermap_node 通过两个 hlist_node 分别链接到</TD></TR>
+            <TR><TD ALIGN="LEFT">   internal 和 external 哈希表</TD></TR>
+            <TR><TD ALIGN="LEFT">2. refcnt 记录有多少个 internal_tuple 引用此节点</TD></TR>
+            <TR><TD ALIGN="LEFT">3. internal_tuple_list 记录所有使用该映射的原始连接</TD></TR>
+            <TR><TD ALIGN="LEFT">4. timer 用于连接老化后延迟释放 servermap 节点</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+}

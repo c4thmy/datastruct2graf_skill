@@ -1,0 +1,179 @@
+// NAT Servermap 哈希表链式结构图 - HTML Table 版本
+// 统一使用 HTML table 风格，垂直排列字段
+digraph NAT_Servermap_Hash_Structure {
+    rankdir=LR;
+    node [fontname="Arial", fontsize=9];
+
+    // Internal 哈希表全局指针
+    inter_hash_head [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD><B>g_nsm_by_address_hash_table_inter</B></TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // External 哈希表全局指针
+    ext_hash_head [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD><B>g_nsm_by_address_hash_table_ext</B></TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // Internal 哈希桶数组 (水平布局的桶列表)
+    inter_bucket_array [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightblue">
+            <TR>
+                <TD PORT="h0">list_head</TD>
+                <TD PORT="h1">list_head</TD>
+                <TD PORT="h2">list_head</TD>
+                <TD>......</TD>
+                <TD PORT="hn">list_head</TD>
+                <TD PORT="hm">list_head</TD>
+            </TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // External 哈希桶数组
+    ext_bucket_array [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightcoral">
+            <TR>
+                <TD PORT="h0">list_head</TD>
+                <TD PORT="h1">list_head</TD>
+                <TD PORT="h2">list_head</TD>
+                <TD>......</TD>
+                <TD PORT="hn">list_head</TD>
+                <TD PORT="hm">list_head</TD>
+            </TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 哈希桶链结构说明
+    chain_struct [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightgray">
+            <TR><TD><B>ip_nat_servermap_hash_chain</B></TD></TR>
+            <TR><TD>nsm_hlist (hlist_head)</TD></TR>
+            <TR><TD>nsmh_lock (rwlock_t)</TD></TR>
+            <TR><TD>count (atomic32_t)</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ServerMap 节点 1
+    node1 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top"><B>ip_nat_servermap_node</B></TD></TR>
+            <TR><TD PORT="ext">nsm_node_by_ext</TD></TR>
+            <TR><TD PORT="inter">nsm_node_by_inter</TD></TR>
+            <TR><TD>src</TD></TR>
+            <TR><TD PORT="sip">IP: 192.168.1.10</TD></TR>
+            <TR><TD PORT="sport">port: 12345</TD></TR>
+            <TR><TD>dst</TD></TR>
+            <TR><TD PORT="dip">IP: 203.0.113.1</TD></TR>
+            <TR><TD PORT="dport">port: 5001</TD></TR>
+            <TR><TD>proto: UDP</TD></TR>
+            <TR><TD>dir: ORIGINAL</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ServerMap 节点 2
+    node2 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top"><B>ip_nat_servermap_node</B></TD></TR>
+            <TR><TD PORT="ext">nsm_node_by_ext</TD></TR>
+            <TR><TD PORT="inter">nsm_node_by_inter</TD></TR>
+            <TR><TD>src</TD></TR>
+            <TR><TD PORT="sip">IP: 192.168.1.20</TD></TR>
+            <TR><TD PORT="sport">port: 54321</TD></TR>
+            <TR><TD>dst</TD></TR>
+            <TR><TD PORT="dip">IP: 203.0.113.1</TD></TR>
+            <TR><TD PORT="dport">port: 5002</TD></TR>
+            <TR><TD>proto: TCP</TD></TR>
+            <TR><TD>dir: ORIGINAL</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ServerMap 节点 3
+    node3 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top"><B>ip_nat_servermap_node</B></TD></TR>
+            <TR><TD PORT="ext">nsm_node_by_ext</TD></TR>
+            <TR><TD PORT="inter">nsm_node_by_inter</TD></TR>
+            <TR><TD>src</TD></TR>
+            <TR><TD PORT="sip">IP: 192.168.1.10</TD></TR>
+            <TR><TD PORT="sport">port: 23456</TD></TR>
+            <TR><TD>dst</TD></TR>
+            <TR><TD PORT="dip">IP: 203.0.113.1</TD></TR>
+            <TR><TD PORT="dport">port: 5003</TD></TR>
+            <TR><TD>proto: UDP</TD></TR>
+            <TR><TD>dir: ORIGINAL</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 更多节点占位符
+    more_nodes [label="......", shape=plaintext];
+
+    // Internal Tuple 1
+    tuple1 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="wheat">
+            <TR><TD><B>ip_nat_servermap_internal_tuple</B></TD></TR>
+            <TR><TD>tuple</TD></TR>
+            <TR><TD>src</TD></TR>
+            <TR><TD>IP: 192.168.1.10</TD></TR>
+            <TR><TD>port: 12345</TD></TR>
+            <TR><TD>dst</TD></TR>
+            <TR><TD>IP: 93.184.216.34</TD></TR>
+            <TR><TD>port: 80</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // Internal Tuple 2
+    tuple2 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="wheat">
+            <TR><TD><B>ip_nat_servermap_internal_tuple</B></TD></TR>
+            <TR><TD>tuple</TD></TR>
+            <TR><TD>src</TD></TR>
+            <TR><TD>IP: 192.168.1.10</TD></TR>
+            <TR><TD>port: 12345</TD></TR>
+            <TR><TD>dst</TD></TR>
+            <TR><TD>IP: 142.250.185.206</TD></TR>
+            <TR><TD>port: 443</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // 更多 tuple 占位符
+    tuple_more [label="......", shape=plaintext];
+
+    // 连接关系 - 哈希表到桶数组
+    inter_hash_head -> inter_bucket_array [label="指向"];
+    ext_hash_head -> ext_bucket_array [label="指向"];
+
+    // 连接关系 - Internal Hash
+    inter_bucket_array:h1 -> node1:inter [label="hash链", color=blue, penwidth=2];
+    inter_bucket_array:h2 -> node3:inter [label="hash链", color=blue, penwidth=2];
+
+    // 连接关系 - External Hash
+    ext_bucket_array:h0 -> node1:ext [label="hash链", color=red, penwidth=2];
+    ext_bucket_array:h1 -> node2:ext [label="hash链", color=red, penwidth=2];
+    node2:ext -> node3:ext [label="冲突链", color=red];
+
+    // 节点间连接
+    node3:ext -> more_nodes [style=dashed];
+
+    // Internal Tuple List 连接
+    node1 -> tuple1 [label="internal_tuple_list", color=green, style=dashed];
+    tuple1 -> tuple2 [label="next", color=green];
+    tuple2 -> tuple_more [label="next", color=green, style=dashed];
+
+    // 结构说明
+    chain_struct -> inter_bucket_array:h0 [label="每个bucket的结构", style=dotted];
+
+    // 说明文字
+    note [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD ALIGN="LEFT"><B>关键点:</B></TD></TR>
+            <TR><TD ALIGN="LEFT">• 每个 servermap_node 同时挂载在两个哈希表上</TD></TR>
+            <TR><TD ALIGN="LEFT">• Internal hash: 按 (i_saddr, i_sport) 索引</TD></TR>
+            <TR><TD ALIGN="LEFT">• External hash: 按 (e_addr, e_port) 索引</TD></TR>
+            <TR><TD ALIGN="LEFT">• internal_tuple_list 记录复用该映射的所有原始连接</TD></TR>
+            <TR><TD ALIGN="LEFT">• refcnt 表示有多少个 tuple 引用该 servermap_node</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+}

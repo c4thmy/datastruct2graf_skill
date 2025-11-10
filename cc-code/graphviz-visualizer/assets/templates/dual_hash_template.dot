@@ -1,0 +1,109 @@
+digraph DualHashTemplate {
+    rankdir=LR;
+    node [fontname="Arial", fontsize=9];
+
+    // ============================================
+    // Internal 哈希表（水平布局）- 浅蓝色
+    // ============================================
+    internal_hash [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightblue">
+            <TR><TD COLSPAN="5"><B>Internal Hash Table</B></TD></TR>
+            <TR>
+                <TD PORT="h0">bucket[0]</TD>
+                <TD PORT="h1">bucket[1]</TD>
+                <TD PORT="h2">bucket[2]</TD>
+                <TD>......</TD>
+                <TD PORT="hn">bucket[n]</TD>
+            </TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // External 哈希表（水平布局）- 浅珊瑚色
+    // ============================================
+    external_hash [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="lightcoral">
+            <TR><TD COLSPAN="5"><B>External Hash Table</B></TD></TR>
+            <TR>
+                <TD PORT="h0">bucket[0]</TD>
+                <TD PORT="h1">bucket[1]</TD>
+                <TD PORT="h2">bucket[2]</TD>
+                <TD>......</TD>
+                <TD PORT="hn">bucket[n]</TD>
+            </TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // Mapping 节点 1 - 浅绿色（带双索引端口）
+    // ============================================
+    mapping1 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top" COLSPAN="2"><B>mapping_node</B></TD></TR>
+            <TR><TD PORT="inter_hash">inter_hash_node</TD><TD BGCOLOR="lightblue">内部索引</TD></TR>
+            <TR><TD PORT="ext_hash">ext_hash_node</TD><TD BGCOLOR="lightcoral">外部索引</TD></TR>
+            <TR><TD>internal_addr</TD><TD>192.168.1.100</TD></TR>
+            <TR><TD>internal_port</TD><TD>12345</TD></TR>
+            <TR><TD>external_addr</TD><TD>203.0.113.5</TD></TR>
+            <TR><TD>external_port</TD><TD>54321</TD></TR>
+            <TR><TD>state</TD><TD>ESTABLISHED</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // Mapping 节点 2 - 浅绿色
+    // ============================================
+    mapping2 [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="palegreen">
+            <TR><TD PORT="top" COLSPAN="2"><B>mapping_node</B></TD></TR>
+            <TR><TD PORT="inter_hash">inter_hash_node</TD><TD BGCOLOR="lightblue">内部索引</TD></TR>
+            <TR><TD PORT="ext_hash">ext_hash_node</TD><TD BGCOLOR="lightcoral">外部索引</TD></TR>
+            <TR><TD>internal_addr</TD><TD>192.168.1.200</TD></TR>
+            <TR><TD>internal_port</TD><TD>23456</TD></TR>
+            <TR><TD>external_addr</TD><TD>203.0.113.10</TD></TR>
+            <TR><TD>external_port</TD><TD>65432</TD></TR>
+            <TR><TD>state</TD><TD>ESTABLISHED</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 辅助结构 - 小麦色
+    // ============================================
+    timer [label=<
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" BGCOLOR="wheat">
+            <TR><TD PORT="top"><B>timer</B></TD></TR>
+            <TR><TD>timeout: 300s</TD></TR>
+            <TR><TD>expires: 12:34:56</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 说明框 - 浅黄色
+    // ============================================
+    note [label=<
+        <TABLE BORDER="1" CELLBORDER="0" CELLSPACING="0" BGCOLOR="lightyellow">
+            <TR><TD ALIGN="LEFT"><B>双哈希表索引说明:</B></TD></TR>
+            <TR><TD ALIGN="LEFT">• 蓝色线: Internal hash 索引</TD></TR>
+            <TR><TD ALIGN="LEFT">• 红色线: External hash 索引</TD></TR>
+            <TR><TD ALIGN="LEFT">• 同一节点同时存在于两个哈希表</TD></TR>
+            <TR><TD ALIGN="LEFT">• 支持双向快速查找</TD></TR>
+        </TABLE>
+    >, shape=plaintext];
+
+    // ============================================
+    // 连接关系
+    // ============================================
+    // Internal hash 连接（蓝色粗线）
+    internal_hash:h1 -> mapping1:inter_hash [color=blue, penwidth=2, label="内部hash"];
+    internal_hash:h2 -> mapping2:inter_hash [color=blue, penwidth=2, label="内部hash"];
+
+    // External hash 连接（红色粗线）
+    external_hash:h1 -> mapping1:ext_hash [color=red, penwidth=2, label="外部hash"];
+    external_hash:h2 -> mapping2:ext_hash [color=red, penwidth=2, label="外部hash"];
+
+    // 辅助结构连接（虚线）
+    mapping1 -> timer [style=dashed, label="timer"];
+
+    // 说明框引用（点线）
+    note -> mapping1 [style=dotted, color=gray];
+}

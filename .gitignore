@@ -1,0 +1,39 @@
+# Git ignore file for datastruct2graf_skill project
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.sublime-*
+
+# Build outputs
+*.png
+*.svg
+*.pdf
+*.jpg
+*.jpeg
+
+# Logs
+*.log
+
+# Node modules (if any)
+node_modules/
+
+# Python cache (if any)
+__pycache__/
+*.pyc
+*.pyo
+
+# Local configuration
+.env
+.env.local
