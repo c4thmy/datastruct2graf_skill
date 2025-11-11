@@ -1,0 +1,77 @@
+// ============================================
+// 图例模板 - 在主图表中添加此部分
+// ============================================
+
+// 图例节点 - 颜色说明
+legend_colors [label=<
+    <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="white"><B>节点颜色图例</B></TD></TR>
+        <TR>
+            <TD BGCOLOR="lightyellow" WIDTH="120">lightyellow</TD>
+            <TD ALIGN="LEFT">全局指针/根节点</TD>
+        </TR>
+        <TR>
+            <TD BGCOLOR="lightblue" WIDTH="120">lightblue</TD>
+            <TD ALIGN="LEFT">Internal/源侧</TD>
+        </TR>
+        <TR>
+            <TD BGCOLOR="lightcoral" WIDTH="120">lightcoral</TD>
+            <TD ALIGN="LEFT">External/目标侧</TD>
+        </TR>
+        <TR>
+            <TD BGCOLOR="palegreen" WIDTH="120">palegreen</TD>
+            <TD ALIGN="LEFT">主数据节点</TD>
+        </TR>
+        <TR>
+            <TD BGCOLOR="wheat" WIDTH="120">wheat</TD>
+            <TD ALIGN="LEFT">辅助结构</TD>
+        </TR>
+        <TR>
+            <TD BGCOLOR="lightgray" WIDTH="120">lightgray</TD>
+            <TD ALIGN="LEFT">说明/元数据</TD>
+        </TR>
+    </TABLE>
+>, shape=plaintext];
+
+// 图例节点 - 连接线说明
+legend_edges [label=<
+    <TABLE BORDER="1" CELLBORDER="1" CELLSPACING="0">
+        <TR><TD COLSPAN="2" BGCOLOR="white"><B>连接线图例</B></TD></TR>
+        <TR>
+            <TD ALIGN="LEFT">━━━▶</TD>
+            <TD ALIGN="LEFT">普通指针连接</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><FONT COLOR="blue"><B>━━━▶</B></FONT></TD>
+            <TD ALIGN="LEFT">哈希链接（蓝色粗线）</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><FONT COLOR="green">━━━▶</FONT></TD>
+            <TD ALIGN="LEFT">链表 next 连接</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT"><FONT COLOR="red">◀━━━</FONT></TD>
+            <TD ALIGN="LEFT">链表 prev 反向</TD>
+        </TR>
+        <TR>
+            <TD ALIGN="LEFT">- - - ▶</TD>
+            <TD ALIGN="LEFT">包含/从属关系</TD>
+        </TR>
+    </TABLE>
+>, shape=plaintext];
+
+// 使用 subgraph 将图例组织在一起
+// 在主 digraph 中添加：
+/*
+subgraph cluster_legend {
+    label="图例说明";
+    style=dashed;
+    color=gray;
+
+    legend_colors;
+    legend_edges;
+
+    // 垂直排列
+    legend_colors -> legend_edges [style=invis];
+}
+*/
